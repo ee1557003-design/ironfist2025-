@@ -64,7 +64,7 @@
         }
         .hero-subtitle { font-size: 0.9rem; color: var(--neon-red); letter-spacing: 5px; font-weight: 900; margin-bottom: 50px; text-shadow: 0 0 10px rgba(255, 0, 60, 0.5); }
         
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 400px; margin-bottom: 40px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 400px; margin-bottom: 20px; }
         @media (min-width: 768px) { .menu-grid { grid-template-columns: repeat(3, 1fr); max-width: 900px; } }
         .menu-card {
             background: rgba(20, 20, 20, 0.8); border: 1px solid #333; border-bottom: 4px solid #444;
@@ -73,6 +73,21 @@
         .menu-card:hover { transform: translateY(-5px); border-bottom-color: var(--neon-red); background: rgba(50, 0, 0, 0.6); }
         .menu-card i { font-size: 2rem; margin-bottom: 15px; color: #888; }
         .menu-card h3 { font-size: 1rem; color: #fff; }
+
+        /* 검색 안내 스타일 추가 */
+        .search-info-box {
+            background: rgba(0, 255, 163, 0.1);
+            border: 1px solid var(--chzzk-green);
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 5px rgba(0, 255, 163, 0.2); } 50% { box-shadow: 0 0 15px rgba(0, 255, 163, 0.4); } 100% { box-shadow: 0 0 5px rgba(0, 255, 163, 0.2); } }
 
         /* 대진표 */
         #view-bracket { flex: 1; width: 100vw; height: calc(100vh - 60px); overflow: hidden; background: transparent; }
@@ -97,6 +112,9 @@
         #stream-wrapper { width: 100%; max-width: 1200px; aspect-ratio: 16 / 9; position: relative; box-shadow: 0 0 50px rgba(0, 255, 163, 0.2); border: 1px solid rgba(0, 255, 163, 0.3); z-index: 10; }
         #stream-container { width: 100%; height: 100%; }
         .stream-ui-overlay { position: absolute; top: -50px; width: 100%; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; z-index: 11; }
+
+        /* 중계 화면 내 안내 바 */
+        .stream-search-bar { width: 100%; max-width: 1200px; background: rgba(0, 255, 163, 0.1); border-left: 4px solid var(--chzzk-green); padding: 10px 15px; margin-bottom: 10px; font-size: 0.85rem; color: #ccc; }
 
         /* 상품 화면 */
         #view-prizes { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 20px; overflow-y: auto; z-index: 1; }
@@ -145,6 +163,11 @@
                 <h3>우승 상품</h3>
             </div>
         </div>
+
+        <div class="search-info-box">
+            <i class="fas fa-search" style="color:var(--chzzk-green); margin-right:8px;"></i>
+            치지직에서 <strong style="color:var(--chzzk-green)">[심인고]</strong>를 검색하여 시청해 주세요!
+        </div>
     </main>
 
     <main id="view-bracket" class="hidden">
@@ -173,6 +196,12 @@
                 <button class="nav-btn" onclick="App.switchView('view-home')" style="background:var(--neon-red); color:#fff; border:none; padding:5px 15px;">CLOSE</button>
             </div>
         </div>
+        
+        <div class="stream-search-bar">
+            <i class="fas fa-info-circle" style="color:var(--chzzk-green); margin-right:5px;"></i>
+            치지직 검색창에 <strong style="color:var(--chzzk-green)">'심인고'</strong>를 입력하면 실시간 채팅 참여가 가능합니다.
+        </div>
+
         <div id="stream-wrapper">
             <div id="stream-container"></div>
         </div>
@@ -234,7 +263,6 @@
             adminEmail: "ee1557003@gmail.com",
             data: [],
             curMatchId: null,
-            // 요청하신 채널 ID 고정
             streamChannelID: "e8a6e6cc0882fce99e7edbb6ba8b0209",
 
             async init() {
@@ -318,11 +346,13 @@
                 document.getElementById(id).classList.remove('hidden');
                 if (id === 'view-bracket') this.renderBracket();
                 if (id === 'view-stream') {
-                    // 치지직 전용 임베드 플레이어 적용
                     document.getElementById('stream-container').innerHTML = 
                         `<iframe src="https://chzzk.naver.com/live-embed/${this.streamChannelID}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
                 } else {
                     document.getElementById('stream-container').innerHTML = "";
+                }
+                if (id === 'view-prizes') {
+                    setTimeout(() => document.querySelector('.prize-box').classList.add('show'), 100);
                 }
             },
 
