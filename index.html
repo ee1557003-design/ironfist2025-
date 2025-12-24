@@ -74,7 +74,6 @@
         .menu-card i { font-size: 2rem; margin-bottom: 15px; color: #888; }
         .menu-card h3 { font-size: 1rem; color: #fff; }
 
-        /* 검색 안내 스타일 추가 */
         .search-info-box {
             background: rgba(0, 255, 163, 0.1);
             border: 1px solid var(--chzzk-green);
@@ -112,16 +111,11 @@
         #stream-wrapper { width: 100%; max-width: 1200px; aspect-ratio: 16 / 9; position: relative; box-shadow: 0 0 50px rgba(0, 255, 163, 0.2); border: 1px solid rgba(0, 255, 163, 0.3); z-index: 10; }
         #stream-container { width: 100%; height: 100%; }
         .stream-ui-overlay { position: absolute; top: -50px; width: 100%; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; z-index: 11; }
-
-        /* 중계 화면 내 안내 바 */
         .stream-search-bar { width: 100%; max-width: 1200px; background: rgba(0, 255, 163, 0.1); border-left: 4px solid var(--chzzk-green); padding: 10px 15px; margin-bottom: 10px; font-size: 0.85rem; color: #ccc; }
 
         /* 상품 화면 */
         #view-prizes { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 20px; overflow-y: auto; z-index: 1; }
-        .prize-box { width: 100%; max-width: 320px; background: rgba(10, 10, 10, 0.8); border: 1px solid #222; padding: 30px; text-align: center; opacity: 0; transform: translateY(20px); transition: 0.5s; backdrop-filter: blur(5px); }
-        .prize-box.show { opacity: 1; transform: translateY(0); }
-        .prize-box.gold { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
-
+        
         /* 모달 */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal-content { background: #111; width: 100%; max-width: 420px; padding: 30px; border: 2px solid var(--neon-red); text-align: center; }
@@ -208,12 +202,7 @@
     </main>
 
     <main id="view-prizes" class="hidden">
-        <div class="prize-box gold">
-            <i class="fas fa-crown" style="color:var(--gold); font-size:3rem; margin-bottom:15px;"></i>
-            <h2 style="color:var(--gold)">CHAMPION</h2>
-            <p style="margin-top:10px; line-height:1.6;">아이패드 프로 M4<br><span style="font-size:1.5rem; font-weight:bold;">+ 상금 300만원</span></p>
-        </div>
-    </main>
+        </main>
 
     <div class="modal" id="scoreModal">
         <div class="modal-content">
@@ -350,9 +339,6 @@
                         `<iframe src="https://chzzk.naver.com/live-embed/${this.streamChannelID}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
                 } else {
                     document.getElementById('stream-container').innerHTML = "";
-                }
-                if (id === 'view-prizes') {
-                    setTimeout(() => document.querySelector('.prize-box').classList.add('show'), 100);
                 }
             },
 
