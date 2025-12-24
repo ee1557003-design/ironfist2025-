@@ -86,7 +86,6 @@
             width: 100%;
             animation: pulse-green 2s infinite;
         }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 5px rgba(0, 255, 163, 0.2); } 50% { box-shadow: 0 0 15px rgba(0, 255, 163, 0.4); } 100% { box-shadow: 0 0 5px rgba(0, 255, 163, 0.2); } }
 
         /* 대진표 */
         #view-bracket { flex: 1; width: 100vw; height: calc(100vh - 60px); overflow: hidden; background: transparent; }
@@ -115,7 +114,7 @@
 
         /* 상품 화면 */
         #view-prizes { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 20px; overflow-y: auto; z-index: 1; }
-        
+
         /* 모달 */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal-content { background: #111; width: 100%; max-width: 420px; padding: 30px; border: 2px solid var(--neon-red); text-align: center; }
@@ -191,18 +190,12 @@
             </div>
         </div>
         
-        <div class="stream-search-bar">
-            <i class="fas fa-info-circle" style="color:var(--chzzk-green); margin-right:5px;"></i>
-            치지직 검색창에 <strong style="color:var(--chzzk-green)">'심인고'</strong>를 입력하면 실시간 채팅 참여가 가능합니다.
-        </div>
-
         <div id="stream-wrapper">
             <div id="stream-container"></div>
         </div>
     </main>
 
-    <main id="view-prizes" class="hidden">
-        </main>
+    <main id="view-prizes" class="hidden"></main>
 
     <div class="modal" id="scoreModal">
         <div class="modal-content">
@@ -256,14 +249,9 @@
 
             async init() {
                 this.createEmbers();
-                
                 onAuthStateChanged(auth, (user) => {
                     const authBtn = document.getElementById('auth-btn');
-                    if (user && user.email === this.adminEmail) {
-                        authBtn.innerText = "LOGOUT";
-                    } else {
-                        authBtn.innerText = "LOGIN";
-                    }
+                    authBtn.innerText = (user && user.email === this.adminEmail) ? "LOGOUT" : "LOGIN";
                 });
 
                 const dataRef = ref(db, this.dbKey);
@@ -271,18 +259,14 @@
                     const val = snapshot.val();
                     if (val) {
                         this.data = val;
-                        if (!document.getElementById('view-bracket').classList.contains('hidden')) {
-                            this.renderBracket();
-                        }
+                        if (!document.getElementById('view-bracket').classList.contains('hidden')) this.renderBracket();
                     } else {
                         this.setupInitialData();
                     }
                 });
             },
 
-            isAdmin() {
-                return auth.currentUser && auth.currentUser.email === this.adminEmail;
-            },
+            isAdmin() { return auth.currentUser && auth.currentUser.email === this.adminEmail; },
 
             async toggleAuth() {
                 if (this.isAdmin()) {
@@ -290,25 +274,24 @@
                     alert("관리자 로그아웃 완료");
                 } else {
                     const email = prompt("관리자 이메일:");
-                    if (!email) return;
                     const password = prompt("비밀번호:");
-                    if (!password) return;
-
-                    try {
-                        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                        if (userCredential.user.email === this.adminEmail) {
+                    if (email && password) {
+                        try {
+                            await signInWithEmailAndPassword(auth, email, password);
                             alert("관리자 로그인 성공");
-                        } else {
-                            alert("인증되었습니다. 단, 관리자 권한이 없는 계정입니다.");
-                        }
-                    } catch (e) {
-                        alert("인증 실패: 정보를 다시 확인하세요.");
+                        } catch (e) { alert("인증 실패"); }
                     }
                 }
             },
 
             setupInitialData() {
-                const players = ["김지담","부전승","배서준","하성민","송연우","이준우","전태준","부전승","박준표","부전승","김민수","서정욱","강민찬","심승민","차호연","부전승","조이안","부전승","공임영","구민승","이석형","정윤호","조우진","부전승","전민성","부전승","박지훈","임진서","김준우","정찬우","허병우","배호준"];
+                // 요청하신 새로운 선수 명단 (32명)
+                const players = [
+                    "김지담","부전승","배서준","하성민","송연우","이준우","전태준","부전승",
+                    "박준표","부전승","김민수","서정욱","강민찬","심승민","차호연","부전승",
+                    "조이안","부전승","공임영","구민승","이석형","정윤호","조우진","부전승",
+                    "전민성","부전승","박지훈","임진서","김준우","정찬우","허병우","배호준"
+                ];
                 this.data = [];
                 let mId = 0;
                 for (let r = 0; r < 5; r++) {
@@ -325,18 +308,14 @@
                 this.save();
             },
 
-            save() { 
-                if (!this.isAdmin()) return;
-                set(ref(db, this.dbKey), this.data); 
-            },
+            save() { if (this.isAdmin()) set(ref(db, this.dbKey), this.data); },
 
             switchView(id) {
                 document.querySelectorAll('main').forEach(m => m.classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
                 if (id === 'view-bracket') this.renderBracket();
                 if (id === 'view-stream') {
-                    document.getElementById('stream-container').innerHTML = 
-                        `<iframe src="https://chzzk.naver.com/live-embed/${this.streamChannelID}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
+                    document.getElementById('stream-container').innerHTML = `<iframe src="https://chzzk.naver.com/live-embed/${this.streamChannelID}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
                 } else {
                     document.getElementById('stream-container').innerHTML = "";
                 }
@@ -351,16 +330,9 @@
                         const isTbd = match.p1 === "TBD" || match.p2 === "TBD";
                         html += `
                             <div class="match-card" onclick="App.openModal(${match.id})" style="${isTbd ? 'opacity:0.5; cursor:default;' : ''}">
-                                <div class="player-line ${match.winner === 1 ? 'winner' : ''}">
-                                    <span class="p-name">${match.p1}</span>
-                                    <span class="p-score">${match.winner ? match.s1 : ''}</span>
-                                </div>
-                                <div class="player-line ${match.winner === 2 ? 'winner' : ''}">
-                                    <span class="p-name">${match.p2}</span>
-                                    <span class="p-score">${match.winner ? match.s2 : ''}</span>
-                                </div>
-                            </div>
-                        `;
+                                <div class="player-line ${match.winner === 1 ? 'winner' : ''}"><span class="p-name">${match.p1}</span><span class="p-score">${match.winner ? match.s1 : ''}</span></div>
+                                <div class="player-line ${match.winner === 2 ? 'winner' : ''}"><span class="p-name">${match.p2}</span><span class="p-score">${match.winner ? match.s2 : ''}</span></div>
+                            </div>`;
                     });
                     col.innerHTML = html;
                 };
@@ -388,10 +360,7 @@
             },
 
             openModal(id) {
-                if (!this.isAdmin()) { 
-                    alert("관리자 계정(`ee1557003@gmail.com`)으로만 수정 가능합니다."); 
-                    return; 
-                }
+                if (!this.isAdmin()) return alert("관리자만 수정 가능합니다.");
                 const m = this.data.find(x => x.id === id);
                 if (m.p1 === "TBD" || m.p2 === "TBD") return;
                 this.curMatchId = id;
@@ -407,15 +376,13 @@
             modifyScore(pNum, delta) {
                 const el = document.getElementById(`m-p${pNum}-score`);
                 let val = parseInt(el.value) + delta;
-                if (val < 0) val = 0;
-                el.value = val;
+                el.value = val < 0 ? 0 : val;
             },
 
             saveResult() {
-                if (!this.isAdmin()) return;
                 const s1 = parseInt(document.getElementById('m-p1-score').value);
                 const s2 = parseInt(document.getElementById('m-p2-score').value);
-                if (s1 === s2) return alert("무승부는 입력할 수 없습니다.");
+                if (s1 === s2) return alert("무승부 불가");
                 const m = this.data.find(x => x.id === this.curMatchId);
                 const newWinner = s1 > s2 ? 1 : 2;
                 const winName = newWinner === 1 ? m.p1 : m.p2;
@@ -424,8 +391,7 @@
                 const nextIdx = Math.floor(m.index / 2);
                 const nextMatch = this.data.find(x => x.round === m.round + 1 && x.index === nextIdx);
                 if (nextMatch) {
-                    if (m.index % 2 === 0) nextMatch.p1 = winName;
-                    else nextMatch.p2 = winName;
+                    if (m.index % 2 === 0) nextMatch.p1 = winName; else nextMatch.p2 = winName;
                     if (isChanged) this.resetFutureMatches(nextMatch.id);
                 }
                 this.save(); this.closeModal(); this.renderBracket();
@@ -438,8 +404,7 @@
                 const nextIdx = Math.floor(m.index / 2);
                 const nextMatch = this.data.find(x => x.round === m.round + 1 && x.index === nextIdx);
                 if (nextMatch) {
-                    if (m.index % 2 === 0) nextMatch.p1 = "TBD";
-                    else nextMatch.p2 = "TBD";
+                    if (m.index % 2 === 0) nextMatch.p1 = "TBD"; else nextMatch.p2 = "TBD";
                     this.resetFutureMatches(nextMatch.id);
                 }
             },
@@ -450,8 +415,9 @@
                     const ember = document.createElement('div');
                     ember.className = 'ember';
                     const size = Math.random() * 4 + 1;
-                    ember.style.width = `${size}px`; ember.style.height = `${size}px`;
-                    ember.style.left = `${Math.random() * 100}%`; ember.style.bottom = `-10px`;
+                    ember.style.width = ember.style.height = `${size}px`;
+                    ember.style.left = `${Math.random() * 100}%`;
+                    ember.style.bottom = `-10px`;
                     ember.style.setProperty('--duration', `${Math.random() * 5 + 3}s`);
                     ember.style.setProperty('--drift', `${(Math.random() - 0.5) * 200}px`);
                     ember.style.animationDelay = `${Math.random() * 5}s`;
@@ -460,8 +426,8 @@
             },
 
             resetData() { 
-                if (!this.isAdmin()) { alert("관리자 계정만 리셋할 수 있습니다."); return; }
-                if(confirm("모든 데이터가 초기화됩니다.")) { set(ref(db, this.dbKey), null); location.reload(); } 
+                if (!this.isAdmin()) return alert("관리자만 가능");
+                if(confirm("초기화하시겠습니까?")) { set(ref(db, this.dbKey), null); location.reload(); } 
             }
         };
 
