@@ -169,7 +169,7 @@
                 <i class="fas fa-circle-play"></i> LIVE ARENA
             </span>
             <div style="display:flex; gap:10px;">
-                <button class="nav-btn" onclick="window.open('https://chzzk.naver.com/e8a6e6cc0882fce99e7edbb6ba8b0209', '_blank')" style="background:#222; color:var(--chzzk-green); border-color:var(--chzzk-green);">방송국 가기</button>
+                <button class="nav-btn" onclick="window.open('https://chzzk.naver.com/live/e8a6e6cc0882fce99e7edbb6ba8b0209', '_blank')" style="background:#222; color:var(--chzzk-green); border-color:var(--chzzk-green);">방송국 가기</button>
                 <button class="nav-btn" onclick="App.switchView('view-home')" style="background:var(--neon-red); color:#fff; border:none; padding:5px 15px;">CLOSE</button>
             </div>
         </div>
@@ -234,6 +234,7 @@
             adminEmail: "ee1557003@gmail.com",
             data: [],
             curMatchId: null,
+            // 요청하신 채널 ID 고정
             streamChannelID: "e8a6e6cc0882fce99e7edbb6ba8b0209",
 
             async init() {
@@ -241,7 +242,6 @@
                 
                 onAuthStateChanged(auth, (user) => {
                     const authBtn = document.getElementById('auth-btn');
-                    // 관리자 이메일과 일치할 때만 로그아웃 표시
                     if (user && user.email === this.adminEmail) {
                         authBtn.innerText = "LOGOUT";
                     } else {
@@ -318,6 +318,7 @@
                 document.getElementById(id).classList.remove('hidden');
                 if (id === 'view-bracket') this.renderBracket();
                 if (id === 'view-stream') {
+                    // 치지직 전용 임베드 플레이어 적용
                     document.getElementById('stream-container').innerHTML = 
                         `<iframe src="https://chzzk.naver.com/live-embed/${this.streamChannelID}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
                 } else {
